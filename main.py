@@ -51,7 +51,7 @@ for pipeline_paginator_page in pipeline_paginator_response_iterator:
         if 'pipelineType' not in pipeline:
             print("ERROR: Boto3 did not detect pipeline type. Upgrade boto3 to continue.")
             quit()
-        
+
         print(f"{pipeline['name']}", end='', flush=True)
 
         pipeline_billable_minutes = 0
@@ -63,7 +63,7 @@ for pipeline_paginator_page in pipeline_paginator_response_iterator:
             continue
 
         billable_pipeline = False
-    
+
         execution_paginator = client.get_paginator('list_action_executions')
         execution_paginator_response_iterator = execution_paginator.paginate(pipelineName=pipeline['name'], PaginationConfig={'PageSize': 100})
         for execution_paginator_page in execution_paginator_response_iterator:
@@ -79,7 +79,7 @@ for pipeline_paginator_page in pipeline_paginator_response_iterator:
                     cost = math.ceil((min(action_execution['lastUpdateTime'], current_bill_starttime) - max(previous_bill_starttime, action_execution['startTime'])).total_seconds()/60)
                     total_billable_minutes += cost
                     pipeline_billable_minutes += cost
-        
+
         if ((pipeline['created'] + timedelta(days=30)) > current_bill_starttime): # https://aws.amazon.com/codepipeline/pricing/
             billable_pipeline = False
 
@@ -87,13 +87,13 @@ for pipeline_paginator_page in pipeline_paginator_response_iterator:
             total_billable_pipelines += 1
 
         v2_pipeline_cost_nft = (pipeline_billable_minutes * COST_PER_ACTION_MINUTE_V2)
-        
+
         if v2_pipeline_cost_nft > COST_PER_PIPELINE_V1:
-            print(f" • V2 Cost = {bcolors.FAIL}${v2_pipeline_cost_nft:,.2f}{bcolors.ENDC}")
+            print(f" • V2 Cost = {bcolors.FAIL}${v2_pipeline_cost_nft:,.2f}{bcolors.ENDC} (V2 cost is higher)")
         elif (v2_pipeline_cost_nft == COST_PER_PIPELINE_V1) or (v2_pipeline_cost_nft == 0 and not billable_pipeline):
-            print(f" • V2 Cost = ${v2_pipeline_cost_nft:,.2f}")
+            print(f" • V2 Cost = ${v2_pipeline_cost_nft:,.2f} (V2 cost is equal)")
         else:
-            print(f" • V2 Cost = {bcolors.OKGREEN}${v2_pipeline_cost_nft:,.2f}{bcolors.ENDC}")
+            print(f" • V2 Cost = {bcolors.OKGREEN}${v2_pipeline_cost_nft:,.2f}{bcolors.ENDC} (V2 cost is lower)")
 
 v1_cost = max(0, total_billable_pipelines - FREE_TIER_V1_PIPELINES) * COST_PER_PIPELINE_V1
 v1_cost_nft = total_billable_pipelines * COST_PER_PIPELINE_V1
@@ -107,9 +107,12 @@ print(f"Total Billable Minutes: {total_billable_minutes:,}")
 if v1_cost > v2_cost:
     print(f"Total Cost Under V1: {bcolors.FAIL}${v1_cost:,.2f} (${v1_cost_nft:,.2f} without free tier){bcolors.ENDC}")
     print(f"Total Cost Under V2: {bcolors.OKGREEN}${v2_cost:,.2f} (${v2_cost_nft:,.2f} without free tier){bcolors.ENDC}")
+    print(f"V2 is {bcolors.OKGREEN}${v1_cost - v2_cost:,.2f}{bcolors.ENDC} cheaper than V1")
 elif v1_cost == v2_cost:
     print(f"Total Cost Under V1: ${v1_cost:,.2f} (${v1_cost_nft:,.2f} without free tier)")
     print(f"Total Cost Under V2: ${v2_cost:,.2f} (${v2_cost_nft:,.2f} without free tier)")
+    print(f"V1 and V2 are equal in cost")
 else:
     print(f"Total Cost Under V1: {bcolors.OKGREEN}${v1_cost:,.2f} (${v1_cost_nft:,.2f} without free tier){bcolors.ENDC}")
     print(f"Total Cost Under V2: {bcolors.FAIL}${v2_cost:,.2f} (${v2_cost_nft:,.2f} without free tier){bcolors.ENDC}")
+    print(f"V1 is {bcolors.FAIL}${v2_cost - v1_cost:,.2f}{bcolors.ENDC} cheaper than V2")
