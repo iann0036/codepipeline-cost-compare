@@ -59,6 +59,7 @@ for pipeline_paginator_page in pipeline_paginator_response_iterator:
         if (pipeline['created'].year < previous_bill_year or pipeline['created'].month <= previous_bill_month):
             total_pipelines += 1
         else:
+            print(f" • V2 Cost = $0.00")
             continue
 
         billable_pipeline = False
