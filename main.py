@@ -89,11 +89,11 @@ for pipeline_paginator_page in pipeline_paginator_response_iterator:
         v2_pipeline_cost_nft = (pipeline_billable_minutes * COST_PER_ACTION_MINUTE_V2)
 
         if v2_pipeline_cost_nft > COST_PER_PIPELINE_V1:
-            print(f" • V2 Cost = {bcolors.FAIL}${v2_pipeline_cost_nft:,.2f}{bcolors.ENDC} v2 cost is higher than v1 cost")
+            print(f" • V2 Cost = {bcolors.FAIL}${v2_pipeline_cost_nft:,.2f}{bcolors.ENDC} (V2 cost is higher)")
         elif (v2_pipeline_cost_nft == COST_PER_PIPELINE_V1) or (v2_pipeline_cost_nft == 0 and not billable_pipeline):
-            print(f" • V2 Cost = ${v2_pipeline_cost_nft:,.2f} v2 cost is equal to v1 cost")
+            print(f" • V2 Cost = ${v2_pipeline_cost_nft:,.2f} (V2 cost is equal)")
         else:
-            print(f" • V2 Cost = {bcolors.OKGREEN}${v2_pipeline_cost_nft:,.2f}{bcolors.ENDC} v2 cost is lower than v1 cost")
+            print(f" • V2 Cost = {bcolors.OKGREEN}${v2_pipeline_cost_nft:,.2f}{bcolors.ENDC} (V2 cost is lower)")
 
 v1_cost = max(0, total_billable_pipelines - FREE_TIER_V1_PIPELINES) * COST_PER_PIPELINE_V1
 v1_cost_nft = total_billable_pipelines * COST_PER_PIPELINE_V1
