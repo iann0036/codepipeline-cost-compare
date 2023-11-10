@@ -2,6 +2,8 @@
 
 > Compare the costs of V1 and V2 CodePipeline types based on historic usage
 
+![Screenshot](https://repository-images.githubusercontent.com/716962610/5ae62dfd-bc45-485f-8f02-563ac03f122b)
+
 ## Usage
 
 ```
